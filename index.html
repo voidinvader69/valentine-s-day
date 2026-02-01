@@ -14,7 +14,7 @@
   <style>
     body {
       font-family: 'Indie Flower', cursive;
-      overflow-x: hidden; /* Prevent horizontal scroll */
+      overflow-x: hidden;
       overflow-y: auto;
     }
 
@@ -56,8 +56,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      transition: opacity 0.5s;
-      padding: 20px; /* Added padding for mobile safety */
+      padding: 20px;
       box-sizing: border-box;
     }
 
@@ -67,7 +66,7 @@
       gap: 20px;
       justify-content: center;
       align-items: center;
-      flex-wrap: wrap; /* Allows gifts to stack on mobile */
+      flex-wrap: wrap; 
       z-index: 20;
     }
     
@@ -111,8 +110,7 @@
       width: 300px;
       height: 400px;
       perspective: 1000px;
-      /* Responsive adjustments */
-      max-width: 85vw; /* Ensure it fits on phone screens */
+      max-width: 85vw; 
       max-height: 60vh;
     }
     
@@ -121,7 +119,7 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-      border: 10px solid #8B4513; /* Slightly thinner border for mobile */
+      border: 10px solid #8B4513; 
       border-radius: 4px;
       outline: 1px solid #5a300d;
       box-shadow: inset 2px 2px 8px rgba(0,0,0,0.6), 0 10px 20px rgba(0,0,0,0.4); 
@@ -134,17 +132,15 @@
       opacity: 0 !important;
     }
 
-    /* --- Gift 3: Reasons Wheel --- */
+    /* --- Gift 3: Reasons Area --- */
     .reasons-container { 
         position: relative; 
         width: 100%; 
         max-width: 900px; 
-        height: 700px;   
+        height: 600px; /* Fixed height for desktop */
         display: flex;
         justify-content: center;
         align-items: center;
-        /* Mobile adjustment */
-        height: 80vh; 
     }
     
     .center-heart {
@@ -167,7 +163,7 @@
     .reason-item {
       position: absolute;
       background: white;
-      padding: 5px 12px;
+      padding: 8px 15px;
       border-radius: 15px;
       font-size: 1rem; 
       font-weight: bold;
@@ -178,7 +174,6 @@
       transition: all 0.3s ease;
     }
 
-    /* --- Buttons & UI --- */
     .back-btn {
       position: absolute;
       bottom: 20px;
@@ -205,30 +200,41 @@
       z-index: 30;
     }
 
-    /* --- MOBILE RESPONSIVE TWEAKS --- */
+    /* --- MOBILE OVERRIDES --- */
     @media (max-width: 600px) {
       .center-heart {
-        width: 110px;
-        height: 110px;
-        padding: 10px;
+        width: 120px; height: 120px; padding: 10px;
+        position: relative !important; /* Forces it into the flow */
+        margin-bottom: 20px;
       }
-      .center-heart h2 {
-        font-size: 1.2rem; /* Smaller font in heart */
-        line-height: 1.2;
+      .center-heart h2 { font-size: 1.2rem; line-height: 1.2; }
+      
+      /* On mobile, reasons become a scrolling list */
+      .reasons-container {
+        height: auto; 
+        max-height: 60vh;
+        overflow-y: auto; /* Allow scrolling */
+        flex-direction: column;
+        justify-content: flex-start;
+        padding-top: 20px;
+        padding-bottom: 60px; /* Space for back button */
       }
+      
       .reason-item {
-        font-size: 0.75rem; /* Smaller text for reasons */
-        padding: 3px 8px;
+        position: relative !important; /* Stacks them vertically */
+        transform: none !important;
+        left: auto !important; top: auto !important;
+        margin-bottom: 10px;
+        width: 90%;
+        text-align: center;
+        white-space: normal; /* Allow wrapping text */
       }
-      #valentineQuestion {
-        font-size: 2.5rem; /* Smaller title */
-      }
-      #imageDisplay {
-        height: 200px; /* Smaller image */
-      }
-      .vintage-paper {
-        font-size: 1.1rem; /* Smaller letter text */
-      }
+      
+      #linesSvg { display: none; } /* Hide the lines on mobile */
+      
+      #valentineQuestion { font-size: 2.5rem; }
+      #imageDisplay { height: 200px; }
+      .vintage-paper { font-size: 1.1rem; }
     }
   </style>
 </head>
@@ -350,13 +356,12 @@
         imageDisplay.src = imagePaths[noClickCount]; 
         let sizeMod = noClickCount * 20;
         
-        // Mobile Safe resizing
         const maxWidth = window.innerWidth * 0.8;
         const newWidth = Math.min(80 + sizeMod, maxWidth);
         
         yesButton.style.height = `${48 + sizeMod}px`;
         yesButton.style.width = `${newWidth}px`;
-        yesButton.style.fontSize = `${Math.min(20 + (noClickCount * 5), 40)}px`; // Cap font size
+        yesButton.style.fontSize = `${Math.min(20 + (noClickCount * 5), 40)}px`;
 
         noButton.textContent = [
           "No", "Are you sure?", "Pookie please", 
@@ -418,7 +423,7 @@
       }
     }
 
-    // --- Gift 3: Reasons Generator (RESPONSIVE FIX) ---
+    // --- Gift 3: Reasons Logic (Mobile-Optimized) ---
     function generateReasons() {
       const reasonsList = [
         "Your smile", "Your laugh", "The way you understand me",
@@ -436,55 +441,70 @@
       svg.innerHTML = "";
       svg.appendChild(defs);
 
-      // --- RESPONSIVE MATH ---
-      const isMobile = window.innerWidth < 600; // Check if mobile
-      const radius = isMobile ? 110 : 230;     // Smaller radius for mobile
-      const textGap = isMobile ? 10 : 15;      // Smaller gap
-      const centerRadius = isMobile ? 60 : 100; // Radius where line starts (border of heart)
-      
-      reasonsList.forEach((text, index) => {
-        const angle = (index / reasonsList.length) * 2 * Math.PI; 
+      // Detect Mobile
+      const isMobile = window.innerWidth < 600;
+
+      if (isMobile) {
+        // --- MOBILE LAYOUT: List View ---
+        // We do NOT use the SVG lines or circle math.
+        reasonsList.forEach((text, index) => {
+          const div = document.createElement("div");
+          div.className = "reason-item fade-in";
+          div.innerText = text;
+          // Items will just stack naturally due to CSS overrides
+          div.style.animationDelay = `${index * 0.1}s`;
+          container.appendChild(div);
+        });
+
+      } else {
+        // --- DESKTOP LAYOUT: Circle View ---
+        const radius = 230; 
+        const textGap = 15; 
         
-        const lineX = Math.cos(angle) * radius;
-        const lineY = Math.sin(angle) * radius;
+        reasonsList.forEach((text, index) => {
+          const angle = (index / reasonsList.length) * 2 * Math.PI; 
+          
+          const lineX = Math.cos(angle) * radius;
+          const lineY = Math.sin(angle) * radius;
 
-        const textX = Math.cos(angle) * (radius + textGap);
-        const textY = Math.sin(angle) * (radius + textGap);
+          const textX = Math.cos(angle) * (radius + textGap);
+          const textY = Math.sin(angle) * (radius + textGap);
 
-        const div = document.createElement("div");
-        div.className = "reason-item fade-in";
-        div.innerText = text;
-        
-        div.style.left = `calc(50% + ${textX}px)`;
-        div.style.top = `calc(50% + ${textY}px)`;
+          const div = document.createElement("div");
+          div.className = "reason-item fade-in";
+          div.innerText = text;
+          
+          div.style.left = `calc(50% + ${textX}px)`;
+          div.style.top = `calc(50% + ${textY}px)`;
 
-        if (Math.cos(angle) >= 0) {
-            div.style.transform = "translate(0, -50%)"; 
-            div.style.textAlign = "left";
-        } else {
-            div.style.transform = "translate(-100%, -50%)"; 
-            div.style.textAlign = "right";
-        }
+          if (Math.cos(angle) >= 0) {
+              div.style.transform = "translate(0, -50%)"; 
+              div.style.textAlign = "left";
+          } else {
+              div.style.transform = "translate(-100%, -50%)"; 
+              div.style.textAlign = "right";
+          }
 
-        div.style.animationDelay = `${index * 0.1}s`;
-        container.appendChild(div);
+          div.style.animationDelay = `${index * 0.1}s`;
+          container.appendChild(div);
 
-        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        // Start line from the edge of the heart, not center
-        const startX = Math.cos(angle) * centerRadius;
-        const startY = Math.sin(angle) * centerRadius;
+          const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+          const startRadius = 100;
+          const startX = Math.cos(angle) * startRadius;
+          const startY = Math.sin(angle) * startRadius;
 
-        line.setAttribute('x1', `calc(50% + ${startX}px)`);
-        line.setAttribute('y1', `calc(50% + ${startY}px)`);
-        line.setAttribute('x2', `calc(50% + ${lineX}px)`);
-        line.setAttribute('y2', `calc(50% + ${lineY}px)`);
-        line.setAttribute('stroke', '#bd1e59');
-        line.setAttribute('stroke-width', '2');
-        line.setAttribute('stroke-dasharray', '5,5');
-        line.setAttribute('marker-end', 'url(#arrowhead)');
-        
-        svg.appendChild(line);
-      });
+          line.setAttribute('x1', `calc(50% + ${startX}px)`);
+          line.setAttribute('y1', `calc(50% + ${startY}px)`);
+          line.setAttribute('x2', `calc(50% + ${lineX}px)`);
+          line.setAttribute('y2', `calc(50% + ${lineY}px)`);
+          line.setAttribute('stroke', '#bd1e59');
+          line.setAttribute('stroke-width', '2');
+          line.setAttribute('stroke-dasharray', '5,5');
+          line.setAttribute('marker-end', 'url(#arrowhead)');
+          
+          svg.appendChild(line);
+        });
+      }
     }
 
     window.showFinalScreen = function() {
