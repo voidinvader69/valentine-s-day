@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Be My Valentine?</title>
+  
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💜</text></svg>">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Indie+Flower&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Indie Flower', cursive;
+      overflow: hidden; 
+    }
+
+    .gradient-background {
+      background: linear-gradient(
+        180deg,
+        rgba(255, 208, 229, 1) 0%,
+        rgba(255, 232, 242, 1) 36%,
+        rgba(255, 255, 255, 1) 100%
+      );
+    }
+
+    .bounce2 { animation: bounce2 2s ease infinite; }
+    @keyframes bounce2 {
+      0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-20px); }
+      60% { transform: translateY(-10px); }
+    }
+
+    .fade-in { animation: fadeIn 0.8s ease forwards; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .wiggle { animation: wiggle 2s ease-in-out infinite; }
+    @keyframes wiggle {
+      0%, 100% { transform: rotate(-3deg); }
+      50% { transform: rotate(3deg); }
+    }
+
+    .hidden { display: none !important; }
+    
+    .screen {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.5s;
+    }
+
+    .gift-container {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      align-items: center;
+      z-index: 20;
+    }
+    
+    .gift-box {
+      font-size: 50px;
+      cursor: pointer;
+      transition: transform 0.3s;
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+    }
+    .gift-box:hover { transform: scale(1.2) rotate(10deg); }
+    
+    .vintage-paper {
+      background-color: #f4e4bc;
+      background-image: repeating-linear-gradient(to bottom, transparent, transparent 29px, #d8c0a4 30px);
+      width: 90%;
+      max-width: 500px;
+      padding: 30px;
+      border-radius: 5px;
+      box-shadow: 5px 5px 15px rgba(0,0,0,0.2);
+      font-family: 'Caveat', cursive;
+      font-size: 1.5rem;
+      line-height: 30px;
+      position: relative;
+      transform: rotate(-1deg);
+      border: 1px solid #d3c4a5;
+    }
+    .tape {
+      background-color: rgba(255,255,255,0.4);
+      width: 100px; height: 30px;
+      position: absolute;
+      top: -10px; left: 50%;
+      transform: translateX(-50%) rotate(2deg);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    /* Wooden Frame Style */
+    .photo-stack-container {
+      position: relative;
+      width: 300px;
+      height: 400px;
+      perspective: 1000px;
+    }
+    
+    .stack-photo {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border: 15px solid #8B4513;
+      border-radius: 4px;
+      outline: 1px solid #5a300d;
+      box-shadow: inset 2px 2px 8px rgba(0,0,0,0.6), 0 10px 20px rgba(0,0,0,0.4); 
+      transition: transform 0.6s ease, opacity 0.5s ease;
+      cursor: pointer;
+    }
+    
+    .slide-out {
+      transform: translateX(300px) rotate(20deg) !important;
+      opacity: 0 !important;
+    }
+
+    .reasons-container { 
+        position: relative; 
+        width: 100%; 
+        max-width: 900px; 
+        height: 700px;   
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .center-heart {
+      position: absolute;
+      background: #ffecf2;
+      padding: 30px;
+      border-radius: 50%;
+      text-align: center;
+      box-shadow: 0 0 20px rgba(255, 105, 180, 0.4);
+      z-index: 10;
+      border: 2px solid #fff;
+      width: 180px; 
+      height: 180px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .reason-item {
+      position: absolute;
+      background: white;
+      padding: 5px 12px;
+      border-radius: 15px;
+      font-size: 1rem; 
+      font-weight: bold;
+      color: #bd1e59;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      white-space: nowrap; 
+      z-index: 5;
+    }
+
+    .back-btn {
+      position: absolute;
+      bottom: 20px;
+      background: #bd1e59;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 25px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(189, 30, 89, 0.3);
+      transition: transform 0.2s;
+      z-index: 50;
+    }
+    .back-btn:hover { transform: scale(1.05); background: #a0184a; }
+
+    .final-trigger {
+      position: absolute;
+      bottom: 30px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: bounce2 2s infinite;
+      z-index: 30;
+    }
+  </style>
+</head>
+
+<body class="gradient-background">
+  
+  <div id="mainScreen" class="screen fade-in">
+    <div class="flex flex-col items-center p-4 text-center">
+      <img id="imageDisplay" src="./images/image1.gif" class="rounded-md h-[300px] object-cover shadow-lg" />
+      <h2 id="valentineQuestion" class="text-5xl font-bold italic text-[#bd1e59] my-4 flex items-center gap-2 justify-center" style="font-family: 'Caveat', cursive;">
+        Will you be my Valentine?
+      </h2>
+      <div class="flex gap-4 pt-[20px] items-center" id="responseButtons">
+        <button id="yesButton" class="bounce2 rounded-md text-[20px] font-medium bg-green-500 hover:bg-green-400 text-white px-4 py-2 min-h-12 min-w-[75px] shadow-md transition-all">Yes</button>
+        <button id="noButton" class="rounded-md text-[20px] font-medium bg-red-500 hover:bg-red-700 text-white px-4 py-2 min-h-12 min-w-[75px] shadow-md transition-all">No</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="giftScreen" class="screen hidden">
+    <h2 class="text-4xl font-bold text-[#bd1e59] mb-8 wiggle" style="font-family: 'Caveat', cursive;">Yay! Pick a gift, my love! 💝</h2>
+    <div class="gift-container">
+      <div id="gift1" class="gift-box" onclick="openGift(1)">
+        <div class="text-center">
+          <div class="text-6xl">🎁</div>
+          <div class="text-lg text-[#bd1e59] font-bold mt-2">Gift 1</div>
+        </div>
+      </div>
+      <div id="gift2" class="gift-box" onclick="openGift(2)">
+        <div class="text-center">
+          <div class="text-6xl">🎁</div>
+          <div class="text-lg text-[#bd1e59] font-bold mt-2">Gift 2</div>
+        </div>
+      </div>
+      <div id="gift3" class="gift-box" onclick="openGift(3)">
+        <div class="text-center">
+          <div class="text-6xl">🎁</div>
+          <div class="text-lg text-[#bd1e59] font-bold mt-2">Gift 3</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="finalSurpriseTrigger" class="final-trigger hidden" onclick="showFinalScreen()">
+      <span class="text-pink-600 text-sm font-bold bg-white px-2 py-1 rounded shadow mb-1">Click me ;)</span>
+      <span class="text-5xl drop-shadow-lg">💖</span>
+    </div>
+  </div>
+
+  <div id="gift1Content" class="screen hidden">
+    <div class="vintage-paper fade-in">
+      <div class="tape"></div>
+      <p>My Dearest Valentine,</p>
+      <p>
+        I cannot put into words how happy I am that you said yes. You make my world brighter just by being in it.
+        Every moment with you is a treasure, and I can't wait to make more beautiful memories together.
+      </p>
+      <p class="mt-4 text-right">- Forever Yours ❤️</p>
+    </div>
+    <button class="back-btn" onclick="goBackToGifts()">Back to Gifts</button>
+  </div>
+
+  <div id="gift2Content" class="screen hidden">
+    <h3 class="text-2xl text-[#bd1e59] font-bold mb-6">Tap the photos! 📸</h3>
+    <div class="photo-stack-container" id="photoStack"></div>
+    <button class="back-btn" onclick="goBackToGifts()">Back to Gifts</button>
+  </div>
+
+  <div id="gift3Content" class="screen hidden">
+    <div class="reasons-container fade-in" id="reasonsContainer">
+      <svg id="linesSvg" class="absolute w-full h-full pointer-events-none" style="z-index: 1;">
+        <defs>
+          <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#bd1e59" />
+          </marker>
+        </defs>
+      </svg>
+      <div class="center-heart">
+        <h2 class="text-3xl font-bold text-[#bd1e59]" style="font-family: 'Caveat', cursive;">I LOVE YOU<br>BECAUSE...</h2>
+      </div>
+      <div id="reasonsList"></div>
+    </div>
+    <button class="back-btn" onclick="goBackToGifts()">Back to Gifts</button>
+  </div>
+
+  <div id="finalScreen" class="screen hidden">
+    <img src="./images/image7.gif" class="rounded-md h-[300px] object-cover mb-4 shadow-xl fade-in" />
+    <h1 class="text-5xl font-bold text-[#bd1e59] text-center" style="font-family: 'Caveat', cursive;">
+      Open the package cutie 💝
+    </h1>
+    <p class="text-xl text-gray-600 mt-2">I have a real surprise waiting for you!</p>
+  </div>
+
+  <script type="module">
+    import confetti from "https://cdn.skypack.dev/canvas-confetti";
+
+    // Variables
+    const yesButton = document.getElementById("yesButton");
+    const noButton = document.getElementById("noButton");
+    const imageDisplay = document.getElementById("imageDisplay");
+    let noClickCount = 0;
+    const openedGifts = new Set();
+    
+    // Screens
+    const mainScreen = document.getElementById("mainScreen");
+    const giftScreen = document.getElementById("giftScreen");
+    const gift1Content = document.getElementById("gift1Content");
+    const gift2Content = document.getElementById("gift2Content");
+    const gift3Content = document.getElementById("gift3Content");
+    const finalScreen = document.getElementById("finalScreen");
+    const finalSurpriseTrigger = document.getElementById("finalSurpriseTrigger");
+
+    // No Button Logic
+    const imagePaths = [
+      "./images/image1.gif", "./images/image2.gif", "./images/image3.gif",
+      "./images/image4.gif", "./images/image5.gif", "./images/image6.gif", "./images/image7.gif"
+    ];
+
+    noButton.addEventListener("click", () => {
+      if (noClickCount < 5) {
+        noClickCount++;
+        imageDisplay.src = imagePaths[noClickCount];
+        let sizeMod = noClickCount * 20;
+        
+        yesButton.style.height = `${48 + sizeMod}px`;
+        yesButton.style.width = `${80 + sizeMod}px`;
+        yesButton.style.fontSize = `${20 + (noClickCount * 5)}px`;
+
+        noButton.textContent = [
+          "No", "Are you sure?", "Pookie please", 
+          "Don't do this :(", "You're breaking my heart", "I'm gonna cry..."
+        ][noClickCount];
+      }
+    });
+
+    yesButton.addEventListener("click", () => {
+      confetti({ particleCount: 500, spread: 100, origin: { y: 0.6 } });
+      mainScreen.classList.add("hidden");
+      giftScreen.classList.remove("hidden");
+      giftScreen.classList.add("fade-in");
+    });
+
+    // Gift Logic
+    window.openGift = function(id) {
+      openedGifts.add(id);
+      giftScreen.classList.add("hidden");
+
+      if (id === 1) {
+        gift1Content.classList.remove("hidden");
+      } else if (id === 2) {
+        gift2Content.classList.remove("hidden");
+        initPhotoStack();
+      } else if (id === 3) {
+        gift3Content.classList.remove("hidden");
+        generateReasons();
+      }
+    };
+
+    window.goBackToGifts = function() {
+      gift1Content.classList.add("hidden");
+      gift2Content.classList.add("hidden");
+      gift3Content.classList.add("hidden");
+      giftScreen.classList.remove("hidden");
+
+      if (openedGifts.size === 3) {
+        finalSurpriseTrigger.classList.remove("hidden");
+      }
+    };
+
+    // --- Gift 2: Photo Stack ---
+    function initPhotoStack() {
+      const container = document.getElementById("photoStack");
+      container.innerHTML = ''; // Reset stack every time
+
+      const totalPics = 7;
+      for (let i = 1; i <= totalPics; i++) {
+        const img = document.createElement("img");
+        img.src = `./pics/pic${i}.jpeg`;
+        img.className = "stack-photo";
+        const rotate = (Math.random() * 20) - 10;
+        img.style.transform = `rotate(${rotate}deg)`;
+        img.style.zIndex = totalPics - i; 
+        img.addEventListener("click", () => {
+          img.classList.add("slide-out");
+        });
+        container.appendChild(img);
+      }
+    }
+
+    // --- Gift 3: Reasons Generator ---
+    function generateReasons() {
+      const reasonsList = [
+        "Your smile", "Your laugh", "The way you understand me",
+        "Your kindness", "The way you believe in me", "How you feel like home",
+        "Your honesty", "The way you support me", "Your patience",
+        "How you make me better", "The little things you remember", "Your strength",
+        "The way you’re yourself", "How safe I feel with you", "How loving you feels right"
+      ];
+
+      const container = document.getElementById("reasonsList");
+      const svg = document.getElementById("linesSvg");
+      
+      container.innerHTML = "";
+      const defs = svg.querySelector("defs");
+      svg.innerHTML = "";
+      svg.appendChild(defs);
+
+      const radius = 230; 
+      const textGap = 15; 
+      
+      reasonsList.forEach((text, index) => {
+        const angle = (index / reasonsList.length) * 2 * Math.PI; 
+        
+        const lineX = Math.cos(angle) * radius;
+        const lineY = Math.sin(angle) * radius;
+
+        const textX = Math.cos(angle) * (radius + textGap);
+        const textY = Math.sin(angle) * (radius + textGap);
+
+        const div = document.createElement("div");
+        div.className = "reason-item fade-in";
+        div.innerText = text;
+        
+        div.style.left = `calc(50% + ${textX}px)`;
+        div.style.top = `calc(50% + ${textY}px)`;
+
+        if (Math.cos(angle) >= 0) {
+            div.style.transform = "translate(0, -50%)"; 
+            div.style.textAlign = "left";
+        } else {
+            div.style.transform = "translate(-100%, -50%)"; 
+            div.style.textAlign = "right";
+        }
+
+        div.style.animationDelay = `${index * 0.1}s`;
+        container.appendChild(div);
+
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        const startRadius = 100;
+        const startX = Math.cos(angle) * startRadius;
+        const startY = Math.sin(angle) * startRadius;
+
+        line.setAttribute('x1', `calc(50% + ${startX}px)`);
+        line.setAttribute('y1', `calc(50% + ${startY}px)`);
+        line.setAttribute('x2', `calc(50% + ${lineX}px)`);
+        line.setAttribute('y2', `calc(50% + ${lineY}px)`);
+        line.setAttribute('stroke', '#bd1e59');
+        line.setAttribute('stroke-width', '2');
+        line.setAttribute('stroke-dasharray', '5,5');
+        line.setAttribute('marker-end', 'url(#arrowhead)');
+        
+        svg.appendChild(line);
+      });
+    }
+
+    window.showFinalScreen = function() {
+        giftScreen.classList.add("hidden");
+        finalScreen.classList.remove("hidden");
+        confetti({ particleCount: 1000, spread: 150, origin: { y: 0.6 } });
+    };
+
+  </script>
+</body>
+</html>
