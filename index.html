@@ -9,11 +9,13 @@
 
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Indie+Flower&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
   <style>
     body {
       font-family: 'Indie Flower', cursive;
-      overflow: hidden; 
+      overflow-x: hidden; /* Prevent horizontal scroll */
+      overflow-y: auto;
     }
 
     .gradient-background {
@@ -23,6 +25,7 @@
         rgba(255, 232, 242, 1) 36%,
         rgba(255, 255, 255, 1) 100%
       );
+      min-height: 100vh;
     }
 
     .bounce2 { animation: bounce2 2s ease infinite; }
@@ -48,19 +51,23 @@
     
     .screen {
       position: absolute;
-      top: 0; left: 0; width: 100%; height: 100%;
+      top: 0; left: 0; width: 100%; min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       transition: opacity 0.5s;
+      padding: 20px; /* Added padding for mobile safety */
+      box-sizing: border-box;
     }
 
+    /* --- Gift Box Styles --- */
     .gift-container {
       display: flex;
       gap: 20px;
       justify-content: center;
       align-items: center;
+      flex-wrap: wrap; /* Allows gifts to stack on mobile */
       z-index: 20;
     }
     
@@ -69,9 +76,11 @@
       cursor: pointer;
       transition: transform 0.3s;
       filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+      margin: 10px;
     }
     .gift-box:hover { transform: scale(1.2) rotate(10deg); }
     
+    /* --- Gift 1: Letter --- */
     .vintage-paper {
       background-color: #f4e4bc;
       background-image: repeating-linear-gradient(to bottom, transparent, transparent 29px, #d8c0a4 30px);
@@ -96,12 +105,15 @@
       box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
 
-    /* Wooden Frame Style */
+    /* --- Gift 2: Photo Stack --- */
     .photo-stack-container {
       position: relative;
       width: 300px;
       height: 400px;
       perspective: 1000px;
+      /* Responsive adjustments */
+      max-width: 85vw; /* Ensure it fits on phone screens */
+      max-height: 60vh;
     }
     
     .stack-photo {
@@ -109,7 +121,7 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-      border: 15px solid #8B4513;
+      border: 10px solid #8B4513; /* Slightly thinner border for mobile */
       border-radius: 4px;
       outline: 1px solid #5a300d;
       box-shadow: inset 2px 2px 8px rgba(0,0,0,0.6), 0 10px 20px rgba(0,0,0,0.4); 
@@ -122,6 +134,7 @@
       opacity: 0 !important;
     }
 
+    /* --- Gift 3: Reasons Wheel --- */
     .reasons-container { 
         position: relative; 
         width: 100%; 
@@ -130,6 +143,8 @@
         display: flex;
         justify-content: center;
         align-items: center;
+        /* Mobile adjustment */
+        height: 80vh; 
     }
     
     .center-heart {
@@ -146,6 +161,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      transition: all 0.3s ease;
     }
 
     .reason-item {
@@ -159,8 +175,10 @@
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
       white-space: nowrap; 
       z-index: 5;
+      transition: all 0.3s ease;
     }
 
+    /* --- Buttons & UI --- */
     .back-btn {
       position: absolute;
       bottom: 20px;
@@ -186,26 +204,52 @@
       animation: bounce2 2s infinite;
       z-index: 30;
     }
+
+    /* --- MOBILE RESPONSIVE TWEAKS --- */
+    @media (max-width: 600px) {
+      .center-heart {
+        width: 110px;
+        height: 110px;
+        padding: 10px;
+      }
+      .center-heart h2 {
+        font-size: 1.2rem; /* Smaller font in heart */
+        line-height: 1.2;
+      }
+      .reason-item {
+        font-size: 0.75rem; /* Smaller text for reasons */
+        padding: 3px 8px;
+      }
+      #valentineQuestion {
+        font-size: 2.5rem; /* Smaller title */
+      }
+      #imageDisplay {
+        height: 200px; /* Smaller image */
+      }
+      .vintage-paper {
+        font-size: 1.1rem; /* Smaller letter text */
+      }
+    }
   </style>
 </head>
 
 <body class="gradient-background">
   
   <div id="mainScreen" class="screen fade-in">
-    <div class="flex flex-col items-center p-4 text-center">
-      <img id="imageDisplay" src="./images/image1.gif" class="rounded-md h-[300px] object-cover shadow-lg" />
-      <h2 id="valentineQuestion" class="text-5xl font-bold italic text-[#bd1e59] my-4 flex items-center gap-2 justify-center" style="font-family: 'Caveat', cursive;">
+    <div class="flex flex-col items-center p-4 text-center w-full max-w-md">
+      <img id="imageDisplay" src="./images/image1.gif" class="rounded-md h-[300px] w-full object-cover shadow-lg" />
+      <h2 id="valentineQuestion" class="text-4xl md:text-5xl font-bold italic text-[#bd1e59] my-4 flex items-center gap-2 justify-center leading-tight" style="font-family: 'Caveat', cursive;">
         Will you be my Valentine?
       </h2>
-      <div class="flex gap-4 pt-[20px] items-center" id="responseButtons">
-        <button id="yesButton" class="bounce2 rounded-md text-[20px] font-medium bg-green-500 hover:bg-green-400 text-white px-4 py-2 min-h-12 min-w-[75px] shadow-md transition-all">Yes</button>
-        <button id="noButton" class="rounded-md text-[20px] font-medium bg-red-500 hover:bg-red-700 text-white px-4 py-2 min-h-12 min-w-[75px] shadow-md transition-all">No</button>
+      <div class="flex flex-wrap gap-4 pt-[20px] items-center justify-center w-full" id="responseButtons">
+        <button id="yesButton" class="bounce2 rounded-md text-[20px] font-medium bg-green-500 hover:bg-green-400 text-white px-6 py-2 shadow-md transition-all">Yes</button>
+        <button id="noButton" class="rounded-md text-[20px] font-medium bg-red-500 hover:bg-red-700 text-white px-6 py-2 shadow-md transition-all">No</button>
       </div>
     </div>
   </div>
 
   <div id="giftScreen" class="screen hidden">
-    <h2 class="text-4xl font-bold text-[#bd1e59] mb-8 wiggle" style="font-family: 'Caveat', cursive;">Yay! Pick a gift, my love! 💝</h2>
+    <h2 class="text-4xl font-bold text-[#bd1e59] mb-8 wiggle text-center" style="font-family: 'Caveat', cursive;">Yay! Pick a gift, my love! 💝</h2>
     <div class="gift-container">
       <div id="gift1" class="gift-box" onclick="openGift(1)">
         <div class="text-center">
@@ -270,16 +314,14 @@
   </div>
 
   <div id="finalScreen" class="screen hidden">
-    <img src="./images/image7.gif" class="rounded-md h-[300px] object-cover mb-4 shadow-xl fade-in" />
-    <h1 class="text-5xl font-bold text-[#bd1e59] text-center" style="font-family: 'Caveat', cursive;">
+    <img src="./images/image7.gif" class="rounded-md max-w-[90%] h-auto max-h-[300px] object-cover mb-4 shadow-xl fade-in" />
+    <h1 class="text-3xl md:text-5xl font-bold text-[#bd1e59] text-center" style="font-family: 'Caveat', cursive;">
       Open the package cutie 💝
     </h1>
-    <p class="text-xl text-gray-600 mt-2">I have a real surprise waiting for you!</p>
+    <p class="text-lg md:text-xl text-gray-600 mt-2 text-center">I have a real surprise waiting for you!</p>
   </div>
 
-  <script type="module">
-    import confetti from "https://cdn.skypack.dev/canvas-confetti";
-
+  <script>
     // Variables
     const yesButton = document.getElementById("yesButton");
     const noButton = document.getElementById("noButton");
@@ -305,12 +347,16 @@
     noButton.addEventListener("click", () => {
       if (noClickCount < 5) {
         noClickCount++;
-        imageDisplay.src = imagePaths[noClickCount];
+        imageDisplay.src = imagePaths[noClickCount]; 
         let sizeMod = noClickCount * 20;
         
+        // Mobile Safe resizing
+        const maxWidth = window.innerWidth * 0.8;
+        const newWidth = Math.min(80 + sizeMod, maxWidth);
+        
         yesButton.style.height = `${48 + sizeMod}px`;
-        yesButton.style.width = `${80 + sizeMod}px`;
-        yesButton.style.fontSize = `${20 + (noClickCount * 5)}px`;
+        yesButton.style.width = `${newWidth}px`;
+        yesButton.style.fontSize = `${Math.min(20 + (noClickCount * 5), 40)}px`; // Cap font size
 
         noButton.textContent = [
           "No", "Are you sure?", "Pookie please", 
@@ -326,7 +372,6 @@
       giftScreen.classList.add("fade-in");
     });
 
-    // Gift Logic
     window.openGift = function(id) {
       openedGifts.add(id);
       giftScreen.classList.add("hidden");
@@ -356,12 +401,12 @@
     // --- Gift 2: Photo Stack ---
     function initPhotoStack() {
       const container = document.getElementById("photoStack");
-      container.innerHTML = ''; // Reset stack every time
+      container.innerHTML = ''; 
 
       const totalPics = 7;
       for (let i = 1; i <= totalPics; i++) {
         const img = document.createElement("img");
-        img.src = `./pics/pic${i}.jpeg`;
+        img.src = `./pics/pic${i}.jpeg`; 
         img.className = "stack-photo";
         const rotate = (Math.random() * 20) - 10;
         img.style.transform = `rotate(${rotate}deg)`;
@@ -373,7 +418,7 @@
       }
     }
 
-    // --- Gift 3: Reasons Generator ---
+    // --- Gift 3: Reasons Generator (RESPONSIVE FIX) ---
     function generateReasons() {
       const reasonsList = [
         "Your smile", "Your laugh", "The way you understand me",
@@ -391,8 +436,11 @@
       svg.innerHTML = "";
       svg.appendChild(defs);
 
-      const radius = 230; 
-      const textGap = 15; 
+      // --- RESPONSIVE MATH ---
+      const isMobile = window.innerWidth < 600; // Check if mobile
+      const radius = isMobile ? 110 : 230;     // Smaller radius for mobile
+      const textGap = isMobile ? 10 : 15;      // Smaller gap
+      const centerRadius = isMobile ? 60 : 100; // Radius where line starts (border of heart)
       
       reasonsList.forEach((text, index) => {
         const angle = (index / reasonsList.length) * 2 * Math.PI; 
@@ -422,9 +470,9 @@
         container.appendChild(div);
 
         const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        const startRadius = 100;
-        const startX = Math.cos(angle) * startRadius;
-        const startY = Math.sin(angle) * startRadius;
+        // Start line from the edge of the heart, not center
+        const startX = Math.cos(angle) * centerRadius;
+        const startY = Math.sin(angle) * centerRadius;
 
         line.setAttribute('x1', `calc(50% + ${startX}px)`);
         line.setAttribute('y1', `calc(50% + ${startY}px)`);
